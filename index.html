@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Словник">
+<meta name="theme-color" content="#0c0f14">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<title>Мій словник</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm, personal, like a banking app that counts words instead of pounds
+   IDEA: a bank card whose balance is "words to review today"
+   PICTURE: the green card with the daily balance and progress, then the study screen itself
+   COLOUR and TYPE: charcoal ground, deep green card, mint for progress, red/amber/mint for answers; Manrope
+   LAYOUT: one column up to 560px: card, mode switch, topics, add word; study opens full screen */
+:root{color-scheme:dark;--bg:#0c0f14;--s1:#151a22;--s2:#1d2430;--line:#283142;--ink:#eef2f7;--mute:#8d98aa;--acc:#3ddc97;--bad:#ff6b6b;--mid:#ffb547;--r:20px}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+html,body{overscroll-behavior-y:none}
+textarea{width:100%;min-height:90px;font-size:14px;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:10px 14px;font-family:ui-monospace,monospace}
+header{display:flex;align-items:center;gap:12px;padding:6px 0 18px}
+.logo{width:40px;height:40px;border-radius:12px;background:var(--acc);color:#05261a;display:grid;place-items:center;font-weight:800}
+header h1{font-size:20px;margin:0;flex:1;white-space:nowrap}
+.chip{font-size:13px;color:var(--mute);background:var(--s1);border:1px solid var(--line);padding:6px 10px;border-radius:99px;white-space:nowrap}
+.chip.ok{color:var(--acc)}
+.hero{position:relative;overflow:hidden;border-radius:24px;padding:22px;background:linear-gradient(140deg,#13785a 0%,#0c4a39 55%,#08302a 100%);box-shadow:0 18px 40px -18px #0a4d3b}
+.hero::after{content:"";position:absolute;right:-60px;top:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#ffffff22,transparent 70%)}
+.hero small{color:#bfe9d8;font-size:14px}
+.big{font-size:clamp(44px,12vw,60px);font-weight:800;line-height:1.05;margin:4px 0 2px}
+.hero .sub{color:#d5f3e7;font-size:15px}
+.bar{height:8px;border-radius:9px;background:#ffffff26;overflow:hidden;margin:16px 0 8px}
+.bar i{display:block;height:100%;background:#fff;border-radius:9px;transition:width .4s}
+.row{display:flex;align-items:center;gap:10px}
+.sp{flex:1}
+.start{margin-top:16px;width:100%;min-height:52px;border-radius:16px;background:#fff;color:#0b3d30;font-weight:800;font-size:17px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:4px;margin:18px 0 8px}
+.seg button{min-height:44px;border-radius:12px;color:var(--mute);font-weight:700;font-size:15px}
+.seg button[aria-pressed=true]{background:var(--s2);color:var(--ink)}
+h2{font-size:17px;margin:26px 0 10px}
+.list{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.tp{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-top:1px solid var(--line)}
+.tp:first-child{border-top:0}
+.ic{width:40px;height:40px;flex:none;border-radius:12px;background:var(--s2);display:grid;place-items:center;font-weight:800;color:var(--acc)}
+.tp b{display:block;font-size:15px}
+.tp span{font-size:13px;color:var(--mute)}
+.mini{height:5px;border-radius:5px;background:var(--s2);margin-top:7px;overflow:hidden}
+.mini i{display:block;height:100%;background:var(--acc)}
+.chev{color:var(--mute);font-size:20px}
+.card2{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
+input[type=text]{width:100%;min-height:48px;font-size:16px;border-radius:14px;border:1px solid var(--line);background:var(--bg);padding:10px 14px}
+.btn{min-height:48px;border-radius:14px;padding:0 18px;font-weight:700;background:var(--s2);border:1px solid var(--line)}
+.btn.pri{background:var(--acc);color:#05261a;border-color:var(--acc)}
+.pills{display:flex;gap:6px}
+.pills button{min-width:44px;min-height:40px;border-radius:12px;background:var(--s2);border:1px solid var(--line);font-weight:700}
+.pills button[aria-pressed=true]{background:var(--acc);color:#05261a;border-color:var(--acc)}
+.note{font-size:13px;color:var(--mute);margin-top:18px}
+/* study screen */
+.ov{position:fixed;inset:0;background:var(--bg);z-index:5;display:none;overflow-y:auto}
+.ov.on{display:block}
+.ovin{max-width:560px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));min-height:100%;display:flex;flex-direction:column}
+.x{width:44px;height:44px;border-radius:14px;background:var(--s1);border:1px solid var(--line);font-size:22px}
+.prog{flex:1;height:8px;border-radius:9px;background:var(--s1);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--acc);transition:width .3s}
+.cnt{font-size:14px;color:var(--mute);white-space:nowrap}
+.fc{margin:18px 0;flex:1;min-height:320px;border-radius:24px;background:var(--s1);border:1px solid var(--line);padding:24px 20px;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:10px}
+.fc.tap{cursor:pointer}
+.fc.sm{flex:none;min-height:220px}
+.tag{font-size:13px;color:var(--mute)}
+.term{font-size:clamp(28px,8vw,40px);font-weight:800;line-height:1.1;overflow-wrap:anywhere}
+.tr{font-size:clamp(22px,6vw,28px);font-weight:700;color:var(--acc);line-height:1.2}
+.ex{font-size:16px;color:#c7d0dd;max-width:44ch;margin:4px auto 0}
+.ex b{color:var(--ink)}
+.gap{display:inline-block;min-width:3em;border-bottom:2px solid var(--acc);color:transparent}
+.hint{font-size:13px;color:var(--mute)}
+.say{align-self:center;min-height:40px;padding:0 14px;border-radius:99px;background:var(--s2);border:1px solid var(--line);font-size:14px;font-weight:700}
+.rate{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rate button{min-height:60px;border-radius:16px;font-weight:800;font-size:15px;line-height:1.2}
+.rate small{display:block;font-weight:500;font-size:12px;opacity:.8}
+.r0{background:#3a1d22;color:#ffb3b3}.r1{background:#3a2c14;color:#ffd79a}.r2{background:#123a2c;color:#9cf2c9}
+.opts{display:grid;gap:8px}
+.opts button{min-height:56px;border-radius:16px;background:var(--s1);border:1px solid var(--line);text-align:left;padding:10px 16px;font-weight:600}
+.opts .ok{background:#123a2c;border-color:var(--acc)}.opts .no{background:#3a1d22;border-color:var(--bad)}
+.res{border-radius:16px;padding:12px 16px;margin-bottom:10px;font-weight:600}
+.res.ok{background:#123a2c;color:#9cf2c9}.res.no{background:#3a1d22;color:#ffc4c4}
+.wl{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
+.wl:first-child{border-top:0}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none;background:var(--line)}
+.d1{background:var(--mid)}.d2{background:var(--acc)}
+.wl .del{margin-left:auto;color:var(--bad);font-size:13px;min-height:32px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:10px 14px;display:none;gap:12px;align-items:center;z-index:9;font-size:14px}
+.toast.on{display:flex}
+.toast button{color:var(--acc);font-weight:700}
+.done{text-align:center;padding:40px 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="home">
+  <header><div class="logo">En</div><h1>Мій словник</h1><span class="chip ok" id="sync">Готово</span></header>
+  <section class="hero" aria-label="Підсумок">
+    <small>До повторення сьогодні</small>
+    <div class="big" id="hDue">0</div>
+    <div class="sub" id="hSub"></div>
+    <div class="bar"><i id="hBar" style="width:0"></i></div>
+    <div class="row sub"><span id="hLearn"></span><span class="sp"></span><span id="hStreak"></span></div>
+    <button class="start" id="startAll">Почати</button>
+  </section>
+  <div class="seg" role="group" aria-label="Режим">
+    <button data-m="cards">Картки</button><button data-m="write">Написати</button><button data-m="choose">Вибір</button>
+  </div>
+  <h2>Теми</h2>
+  <div class="list" id="topics"></div>
+  <h2>Налаштування</h2>
+  <div class="card2 row"><span>Нових слів за раз</span><span class="sp"></span><div class="pills" id="newPer"><button>5</button><button>10</button><button>20</button></div></div>
+  <h2>Додати своє слово</h2>
+  <form class="card2" id="addF">
+    <label for="aEn">Англійською</label><input type="text" id="aEn" required autocomplete="off">
+    <label for="aUa">Переклад</label><input type="text" id="aUa" required autocomplete="off">
+    <label for="aEx">Приклад (не обов'язково)</label><input type="text" id="aEx" autocomplete="off">
+    <div style="margin-top:14px"><button class="btn pri" type="submit">Додати в «Мої слова»</button></div>
+  </form>
+  <h2>Резервна копія</h2>
+  <div class="card2">
+    <p style="margin:0 0 10px;color:var(--mute);font-size:14px">Прогрес зберігається тільки на цьому телефоні. Час від часу копіюй код і зберігай його (наприклад, у Нотатках). З цим кодом прогрес можна відновити або перенести на інший пристрій.</p>
+    <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn pri" type="button" id="bCopy">Скопіювати код</button><button class="btn" type="button" id="bShow">Відновити з коду</button></div>
+    <div id="bBox" style="display:none;margin-top:12px"><textarea id="bTxt" placeholder="Встав сюди код"></textarea><div class="row" style="gap:8px;margin-top:8px"><button class="btn pri" type="button" id="bLoad">Відновити</button><span id="bMsg" style="font-size:14px;color:var(--mute)"></span></div></div>
+  </div>
+  <p class="note">Працює без інтернету. Вимова використовує голос, встановлений на телефоні.</p>
+</div>
+
+<div class="ov" id="ov" role="dialog" aria-modal="true">
+  <div class="ovin">
+    <div class="row"><button class="x" id="close" aria-label="Закрити">×</button><div class="prog"><i id="pBar"></i></div><span class="cnt" id="pCnt"></span></div>
+    <div id="stage" style="display:flex;flex-direction:column;flex:1"></div>
+  </div>
+</div>
+<div class="toast" id="toast"><span id="tMsg"></span><button id="tUndo">Повернути</button></div>
+
+<script>
+{
+const DATA={"topics": [{"id": "t1", "name": "Сім'я та походження"}, {"id": "t2", "name": "Фрукти, овочі, м'ясо, риба"}, {"id": "t3", "name": "Вивчення мови"}, {"id": "t4", "name": "Здорове харчування і кулінарія"}, {"id": "t5", "name": "Мотивація і прогрес"}, {"id": "t6", "name": "З розмов"}], "words": [{"id": "t1-1", "t": "t1", "en": "only child", "ua": "єдина дитина", "ex": "She grew up as an **only child** and always wanted siblings."}, {"id": "t1-2", "t": "t1", "en": "single parent", "ua": "самотній батько/мати", "ex": "He's been a **single parent** since the divorce."}, {"id": "t1-3", "t": "t1", "en": "foster parent", "ua": "прийомний батько/прийомна мати (тимчасово)", "ex": "The **foster parents** looked after him for two years."}, {"id": "t1-4", "t": "t1", "en": "adopt a child", "ua": "усиновити/удочерити дитину", "ex": "They decided to **adopt a child** from Colombia."}, {"id": "t1-5", "t": "t1", "en": "get divorced", "ua": "розлучитися", "ex": "My aunt and uncle **got divorced** last spring."}, {"id": "t1-6", "t": "t1", "en": "support someone", "ua": "забезпечувати, підтримувати когось", "ex": "She worked two jobs to **support** her children."}, {"id": "t1-7", "t": "t1", "en": "bring someone up", "ua": "виховувати", "ex": "He was **brought up** by his grandparents."}, {"id": "t1-8", "t": "t1", "en": "stepfather/stepmother", "ua": "вітчим/мачуха", "ex": "My **stepfather** is actually a great cook."}, {"id": "t1-9", "t": "t1", "en": "half-brother/half-sister", "ua": "зведений брат/зведена сестра", "ex": "I have a **half-sister** from my dad's second marriage."}, {"id": "t1-10", "t": "t1", "en": "be related to someone", "ua": "бути родичем комусь", "ex": "Are you **related to** the Johnsons?"}, {"id": "t1-11", "t": "t1", "en": "ancestor", "ua": "предок", "ex": "Some of my **ancestors** came from Poland."}, {"id": "t1-12", "t": "t1", "en": "immigrant", "ua": "іммігрант", "ex": "Her grandparents were **immigrants** who settled in Chicago."}, {"id": "t1-13", "t": "t1", "en": "emigrate from...to...", "ua": "емігрувати з... до...", "ex": "They **emigrated from** Vietnam **to** Canada in the 1980s."}, {"id": "t1-14", "t": "t1", "en": "previous generations", "ua": "попередні покоління", "ex": "**Previous generations** of my family were all farmers."}, {"id": "t1-15", "t": "t1", "en": "originally", "ua": "спочатку, родом", "ex": "We're **originally** from a small village in the north."}, {"id": "t1-16", "t": "t1", "en": "look like someone", "ua": "бути схожим на когось зовні", "ex": "Everyone says I **look like** my mother."}, {"id": "t1-17", "t": "t1", "en": "take after someone", "ua": "бути схожим на когось (характером)", "ex": "She really **takes after** her grandfather — stubborn and funny."}, {"id": "t2-1", "t": "t2", "en": "plums", "ua": "сливи", "ex": "We picked **plums** from the tree in the garden."}, {"id": "t2-2", "t": "t2", "en": "apricots", "ua": "абрикоси", "ex": "The **apricots** at the market looked perfectly ripe."}, {"id": "t2-3", "t": "t2", "en": "raspberries", "ua": "малина", "ex": "She made jam from fresh **raspberries**."}, {"id": "t2-4", "t": "t2", "en": "grapefruit", "ua": "грейпфрут", "ex": "I have half a **grapefruit** for breakfast most mornings."}, {"id": "t2-5", "t": "t2", "en": "avocado", "ua": "авокадо", "ex": "The **avocado** was too hard to eat yet."}, {"id": "t2-6", "t": "t2", "en": "figs", "ua": "інжир", "ex": "We had **figs** and cheese for dessert."}, {"id": "t2-7", "t": "t2", "en": "coconut", "ua": "кокос", "ex": "The recipe calls for grated **coconut**."}, {"id": "t2-8", "t": "t2", "en": "passion fruit", "ua": "маракуя", "ex": "The dessert was topped with **passion fruit**."}, {"id": "t2-9", "t": "t2", "en": "spinach", "ua": "шпинат", "ex": "Add a handful of **spinach** to the smoothie."}, {"id": "t2-10", "t": "t2", "en": "leek", "ua": "цибуля-порей", "ex": "She chopped a **leek** for the soup."}, {"id": "t2-11", "t": "t2", "en": "celery", "ua": "селера", "ex": "A stick of **celery** goes well with peanut butter."}, {"id": "t2-12", "t": "t2", "en": "broccoli", "ua": "броколі", "ex": "The kids finally started eating **broccoli**."}, {"id": "t2-13", "t": "t2", "en": "chickpeas", "ua": "нут", "ex": "We made hummus with **chickpeas**."}, {"id": "t2-14", "t": "t2", "en": "artichoke", "ua": "артишок", "ex": "Have you ever cooked a whole **artichoke**?"}, {"id": "t2-15", "t": "t2", "en": "asparagus", "ua": "спаржа", "ex": "Grilled **asparagus** is one of my favourite sides."}, {"id": "t2-16", "t": "t2", "en": "sweetcorn", "ua": "солодка кукурудза", "ex": "She added **sweetcorn** to the salad."}, {"id": "t2-17", "t": "t2", "en": "beetroot", "ua": "буряк", "ex": "The soup got its colour from **beetroot**."}, {"id": "t2-18", "t": "t2", "en": "herbs (parsley, mint, basil, thyme, rosemary)", "ua": "трави (петрушка, м'ята, базилік, чебрець, розмарин)", "ex": "Fresh **basil** makes all the difference in this sauce."}, {"id": "t2-19", "t": "t2", "en": "veal", "ua": "телятина", "ex": "The restaurant is known for its **veal** dish."}, {"id": "t2-20", "t": "t2", "en": "duck", "ua": "качка", "ex": "We roasted a whole **duck** for the celebration."}, {"id": "t2-21", "t": "t2", "en": "trout/cod/sea bass/carp/salmon", "ua": "форель/тріска/сібас/короп/лосось", "ex": "He caught a **trout** on our fishing trip."}, {"id": "t2-22", "t": "t2", "en": "oyster/squid/lobster/crab/clams/mussels", "ua": "устриця/кальмар/лобстер/краб/молюски/мідії", "ex": "We shared a plate of **oysters** to start."}, {"id": "t3-1", "t": "t3", "en": "foreign", "ua": "іноземний", "ex": "Learning a **foreign** language takes patience."}, {"id": "t3-2", "t": "t3", "en": "gist", "ua": "суть, загальний зміст", "ex": "I didn't understand every word, but I got the **gist**."}, {"id": "t3-3", "t": "t3", "en": "text", "ua": "текст", "ex": "Read the **text** twice before answering the questions."}, {"id": "t3-4", "t": "t3", "en": "recognize sth/sb", "ua": "упізнавати (на вигляд, за звуком)", "ex": "I **recognized** the word from an earlier lesson."}, {"id": "t3-5", "t": "t3", "en": "go through sth", "ua": "уважно опрацювати", "ex": "Let's **go through** the report before the meeting."}, {"id": "t3-6", "t": "t3", "en": "identify sth", "ua": "визначити, розпізнати", "ex": "Try to **identify** the main idea of each paragraph."}, {"id": "t3-7", "t": "t3", "en": "guess sth", "ua": "здогадатися, припустити", "ex": "Can you **guess** the meaning from the context?"}, {"id": "t3-8", "t": "t3", "en": "context", "ua": "контекст", "ex": "The word's meaning became clear from the **context**."}, {"id": "t3-9", "t": "t3", "en": "keep a record of sth", "ua": "вести записи про щось", "ex": "I **keep a record of** all the new words I learn."}, {"id": "t3-10", "t": "t3", "en": "make a note of sth", "ua": "зробити позначку про щось", "ex": "She **made a note of** the deadline in her diary."}, {"id": "t3-11", "t": "t3", "en": "construction", "ua": "конструкція (граматична)", "ex": "This verb has an unusual **construction** with a preposition."}, {"id": "t3-12", "t": "t3", "en": "translation", "ua": "переклад", "ex": "The **translation** didn't capture the original humour."}, {"id": "t3-13", "t": "t3", "en": "formal/informal", "ua": "формальний/неформальний", "ex": "Emails to your boss should stay fairly **formal**."}, {"id": "t3-14", "t": "t3", "en": "conversation", "ua": "розмова, бесіда", "ex": "We had a long **conversation** about our travel plans."}, {"id": "t3-15", "t": "t3", "en": "have a chat with someone", "ua": "побалакати з кимось", "ex": "I had a quick **chat with** my neighbour this morning."}, {"id": "t3-16", "t": "t3", "en": "discussion", "ua": "обговорення", "ex": "The **discussion** got quite heated near the end."}, {"id": "t3-17", "t": "t3", "en": "argument", "ua": "суперечка", "ex": "They had an **argument** about whose turn it was to cook."}, {"id": "t3-18", "t": "t3", "en": "repeat sth", "ua": "повторити", "ex": "Could you **repeat** that more slowly, please?"}, {"id": "t3-19", "t": "t3", "en": "explain sth", "ua": "пояснити", "ex": "Can you **explain** how this machine works?"}, {"id": "t3-20", "t": "t3", "en": "pronounce sth", "ua": "вимовляти", "ex": "I always **mispronounce** her surname."}, {"id": "t3-21", "t": "t3", "en": "opportunity", "ua": "можливість", "ex": "This job is a great **opportunity** to travel."}, {"id": "t3-22", "t": "t3", "en": "experiment with sth", "ua": "експериментувати з чимось", "ex": "She likes to **experiment with** new recipes on weekends."}, {"id": "t3-23", "t": "t3", "en": "make mistakes", "ua": "робити помилки", "ex": "Don't be afraid to **make mistakes** while speaking."}, {"id": "t3-24", "t": "t3", "en": "revise sth", "ua": "повторювати пройдений матеріал", "ex": "I need to **revise** these verbs before the test."}, {"id": "t3-25", "t": "t3", "en": "method", "ua": "метод", "ex": "This **method** of learning suits me much better."}, {"id": "t3-26", "t": "t3", "en": "work (get results)", "ua": "спрацьовувати, давати результат", "ex": "That study technique really **works** for me."}, {"id": "t4-1", "t": "t4", "en": "a waste of time/money", "ua": "марна трата часу/грошей", "ex": "That gym membership was a complete **waste of money**."}, {"id": "t4-2", "t": "t4", "en": "good/bad for you", "ua": "корисно/шкідливо для здоров'я", "ex": "Too much sugar is really **bad for you**."}, {"id": "t4-3", "t": "t4", "en": "keep sth up", "ua": "продовжувати підтримувати", "ex": "It's hard to **keep up** a strict diet during holidays."}, {"id": "t4-4", "t": "t4", "en": "put on weight", "ua": "набрати вагу", "ex": "I **put on weight** over Christmas, as usual."}, {"id": "t4-5", "t": "t4", "en": "junk food", "ua": "шкідлива їжа, фастфуд", "ex": "He rarely eats **junk food** these days."}, {"id": "t4-6", "t": "t4", "en": "plenty of sth", "ua": "багато чогось", "ex": "Drink **plenty of** water during the summer."}, {"id": "t4-7", "t": "t4", "en": "fizzy drink", "ua": "газований напій", "ex": "She swapped **fizzy drinks** for sparkling water."}, {"id": "t4-8", "t": "t4", "en": "snack", "ua": "перекус", "ex": "I had a **snack** between lunch and dinner."}, {"id": "t4-9", "t": "t4", "en": "fattening", "ua": "калорійний, що сприяє набору ваги", "ex": "These pastries are delicious but very **fattening**."}, {"id": "t4-10", "t": "t4", "en": "cut down on sth", "ua": "скоротити споживання чогось", "ex": "We've **cut down on** red meat this year."}, {"id": "t4-11", "t": "t4", "en": "exercise", "ua": "фізична активність", "ex": "Regular **exercise** improves your mood as well as your health."}, {"id": "t4-12", "t": "t4", "en": "balanced diet", "ua": "збалансоване харчування", "ex": "A **balanced diet** includes protein, carbs, and fats."}, {"id": "t4-13", "t": "t4", "en": "recipe", "ua": "рецепт", "ex": "This **recipe** only needs five ingredients."}, {"id": "t4-14", "t": "t4", "en": "ingredients", "ua": "інгредієнти", "ex": "Check you have all the **ingredients** before you start."}, {"id": "t4-15", "t": "t4", "en": "stock", "ua": "бульйон", "ex": "Use vegetable **stock** instead of water for more flavour."}, {"id": "t4-16", "t": "t4", "en": "boil sth", "ua": "варити", "ex": "**Boil** the pasta for about ten minutes."}, {"id": "t4-17", "t": "t4", "en": "fry sth", "ua": "смажити", "ex": "**Fry** the onions until they're golden."}, {"id": "t4-18", "t": "t4", "en": "add sth", "ua": "додати", "ex": "**Add** a pinch of salt at the end."}, {"id": "t4-19", "t": "t4", "en": "bake sth", "ua": "пекти (у духовці)", "ex": "We **baked** a cake for her birthday."}, {"id": "t4-20", "t": "t4", "en": "peel sth", "ua": "чистити (від шкірки)", "ex": "**Peel** the potatoes before boiling them."}, {"id": "t4-21", "t": "t4", "en": "mash sth", "ua": "робити пюре, розминати", "ex": "**Mash** the bananas with a fork."}, {"id": "t4-22", "t": "t4", "en": "chop sth", "ua": "нарізати", "ex": "**Chop** the garlic finely."}, {"id": "t4-23", "t": "t4", "en": "stir sth", "ua": "помішувати", "ex": "**Stir** the sauce so it doesn't stick."}, {"id": "t5-1", "t": "t5", "en": "enthusiastic", "ua": "захоплений, повний ентузіазму", "ex": "She's really **enthusiastic** about learning Portuguese."}, {"id": "t5-2", "t": "t5", "en": "motivated", "ua": "мотивований", "ex": "He's very **motivated** to pass the exam this time."}, {"id": "t5-3", "t": "t5", "en": "after a while", "ua": "через деякий час", "ex": "**After a while**, the pain started to fade."}, {"id": "t5-4", "t": "t5", "en": "improve", "ua": "покращуватися", "ex": "My listening skills **improved** a lot after living abroad."}, {"id": "t5-5", "t": "t5", "en": "express sth", "ua": "виражати (думки, почуття)", "ex": "It's hard to **express** exactly how I feel."}, {"id": "t5-6", "t": "t5", "en": "effectively", "ua": "ефективно", "ex": "She communicates **effectively**, even in a second language."}, {"id": "t5-7", "t": "t5", "en": "obvious", "ua": "очевидний", "ex": "It was **obvious** that he hadn't prepared for the meeting."}, {"id": "t5-8", "t": "t5", "en": "encouraging", "ua": "обнадійливий", "ex": "The teacher's feedback was really **encouraging**."}, {"id": "t5-9", "t": "t5", "en": "accurately", "ua": "точно, без помилок", "ex": "He can now describe the process quite **accurately**."}, {"id": "t5-10", "t": "t5", "en": "be aware of sth", "ua": "усвідомлювати, знати про щось", "ex": "I wasn't **aware of** the new rules until today."}, {"id": "t5-11", "t": "t5", "en": "frustrating", "ua": "дратівливий, що викликає безсилля", "ex": "It's **frustrating** when you know a word but can't recall it."}, {"id": "t5-12", "t": "t5", "en": "goal/aim", "ua": "мета", "ex": "Her main **goal** this year is to speak more fluently."}, {"id": "t5-13", "t": "t5", "en": "everyday", "ua": "повсякденний", "ex": "We mostly talked about **everyday** things like work and food."}, {"id": "t5-14", "t": "t5", "en": "expand", "ua": "розширювати(ся)", "ex": "I want to **expand** my vocabulary before the trip."}, {"id": "t5-15", "t": "t5", "en": "a wide range of", "ua": "широкий спектр", "ex": "The course covers **a wide range of** topics."}, {"id": "t5-16", "t": "t5", "en": "complex", "ua": "складний", "ex": "The instructions were far too **complex** to follow quickly."}, {"id": "t5-17", "t": "t5", "en": "fluent", "ua": "той, хто вільно володіє", "ex": "She's completely **fluent** in three languages."}, {"id": "t5-18", "t": "t5", "en": "in detail", "ua": "докладно", "ex": "Could you explain that **in detail**?"}, {"id": "t5-19", "t": "t5", "en": "appropriate", "ua": "доречний, відповідний", "ex": "That joke wasn't really **appropriate** for the meeting."}, {"id": "t5-20", "t": "t5", "en": "relevant to sth", "ua": "той, що стосується чогось", "ex": "Only include information **relevant to** the topic."}, {"id": "t5-21", "t": "t5", "en": "specialized", "ua": "спеціалізований", "ex": "The article uses quite **specialized** vocabulary."}, {"id": "t6-1", "t": "t6", "en": "be thrown out (throw – threw – thrown)", "ua": "бути вигнаним; we will be thrown out = нас виженуть", "ex": "If we keep making noise, we will **be thrown out** of the pub."}]};
+const DAY=864e5, IV=[0,1,3,7,14,30,60,120], KEY='vocab-oleh-v1';
+let S={cards:{},custom:[],days:[],newPer:10,mode:'cards',u:0};
+try{const j=localStorage.getItem(KEY);if(j)Object.assign(S,JSON.parse(j))}catch(e){}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const exHtml=(ex,gap)=>esc(ex||'').replace(/\*\*(.+?)\*\*/g,gap?'<span class="gap">$1</span>':'<b>$1</b>');
+const topics=()=>DATA.topics.concat(S.custom.length?[{id:'my',name:'Мої слова'}]:[]);
+const words=()=>DATA.words.concat(S.custom);
+const st=id=>S.cards[id];
+const today=()=>new Date().toISOString().slice(0,10);
+const canSpeak='speechSynthesis' in window;
+function say(t){try{const u=new SpeechSynthesisUtterance(t.replace(/\(.*?\)/g,'').replace(/\bsth\b/g,'something').replace(/\bsb\b/g,'somebody').replace(/\//g,', ').replace(/\.\.\./g,' '));u.lang='en-GB';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+
+/* ---------- saving: this phone ---------- */
+function save(){S.u=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Не вдалося зберегти прогрес',null)}}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))),dec=t=>JSON.parse(decodeURIComponent(escape(atob(t.trim()))));
+/* ---------- home ---------- */
+function stats(list){const now=Date.now();let due=0,nw=0,lr=0;
+  for(const w of list){const s=st(w.id);if(!s)nw++;else{if(s.d<=now)due++;if(s.b>=4)lr++}}return{due,nw,lr,all:list.length}}
+function streak(){const set=new Set(S.days);let n=0,d=new Date();if(!set.has(today()))d=new Date(Date.now()-DAY);
+  while(set.has(d.toISOString().slice(0,10))){n++;d=new Date(d.getTime()-DAY)}return n}
+function render(){
+  const a=stats(words()),k=Math.min(a.nw,S.newPer);
+  $('hDue').textContent=a.due;
+  $('hSub').textContent=k?`+ ${k} нових слів у наступному раунді`:'Нових слів більше немає: додай свої нижче';
+  $('hBar').style.width=(a.all?a.lr/a.all*100:0)+'%';
+  $('hLearn').textContent=`Вивчено ${a.lr} з ${a.all}`;
+  const s=streak();$('hStreak').textContent=s?`Серія: ${s} дн.`:'';
+  $('startAll').textContent=a.due+k?`Почати · ${a.due+k} карток`:'Повторити вивчене';
+  document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.mode));
+  document.querySelectorAll('#newPer button').forEach(b=>b.setAttribute('aria-pressed',+b.textContent===S.newPer));
+  $('topics').innerHTML=topics().map((t,i)=>{const l=words().filter(w=>w.t===t.id),x=stats(l);
+    return `<button class="tp" data-t="${t.id}"><span class="ic">${t.id==='my'?'+':i+1}</span><span style="flex:1"><b>${esc(t.name)}</b><span>${x.all} слів · вивчено ${x.lr}${x.due?` · повторити ${x.due}`:''}</span><span class="mini"><i style="width:${x.all?x.lr/x.all*100:0}%"></i></span></span><span class="chev">›</span></button>`}).join('');
+}
+
+/* ---------- spaced repetition ---------- */
+function rate(w,g){const s=st(w.id)||{b:0,d:0,r:0,w:0},now=Date.now();
+  if(g===0){s.b=0;s.d=now;s.w++}
+  else if(g===1){s.b=Math.max(1,s.b);s.d=now+Math.max(1,IV[s.b]/2)*DAY}
+  else{s.b=Math.min(s.b+1,IV.length-1);s.d=now+IV[s.b]*DAY;s.r++}
+  S.cards[w.id]=s;if(!S.days.includes(today())){S.days.push(today());S.days=S.days.slice(-90)}save()}
+const nextIv=(w,g)=>{const b=(st(w.id)||{b:0}).b;if(g===0)return 'зараз';const d=g===1?Math.max(1,IV[Math.max(1,b)]/2):IV[Math.min(b+1,IV.length-1)];return Math.round(d)+' дн.'};
+
+/* ---------- session ---------- */
+let Q=[],qi=0,score=0,again={},cur=null;
+function build(tid){const now=Date.now(),pool=words().filter(w=>!tid||w.t===tid);
+  const due=pool.filter(w=>st(w.id)&&st(w.id).d<=now).sort((a,b)=>st(a.id).d-st(b.id).d);
+  const nw=pool.filter(w=>!st(w.id)).slice(0,S.newPer);
+  let q=due.concat(nw);
+  if(!q.length)q=pool.slice().sort(()=>Math.random()-.5).sort((a,b)=>(st(a.id)||{b:0}).b-(st(b.id)||{b:0}).b).slice(0,15);
+  return q}
+function start(tid){Q=build(tid);qi=0;score=0;again={};if(!Q.length)return;$('ov').classList.add('on');document.body.style.overflow='hidden';show()}
+function stop(){$('ov').classList.remove('on');document.body.style.overflow='';render()}
+function answered(g){rate(cur,g);if(g>0)score++;
+  if(g===0&&(again[cur.id]||0)<3){again[cur.id]=(again[cur.id]||0)+1;Q.splice(Math.min(qi+4,Q.length),0,cur)}
+  qi++;show()}
+function head(){$('pBar').style.width=(qi/Q.length*100)+'%';$('pCnt').textContent=`${Math.min(qi+1,Q.length)} / ${Q.length}`}
+const tName=w=>(topics().find(t=>t.id===w.t)||{}).name||'';
+const sayBtn=w=>canSpeak?`<button class="say" data-say="${esc(w.en)}">Вимова ▸</button>`:'';
+function show(){const el=$('stage');
+  if(qi>=Q.length){$('pBar').style.width='100%';$('pCnt').textContent='';
+    el.innerHTML=`<div class="done"><div class="big" style="color:var(--acc)">${score}/${Q.length}</div><p>Раунд завершено. Наступні повторення з'являться самі, коли настане час.</p><div class="row" style="justify-content:center;gap:8px;flex-wrap:wrap"><button class="btn" id="dHome">На головну</button><button class="btn pri" id="dMore">Ще раунд</button></div></div>`;
+    $('dHome').onclick=stop;$('dMore').onclick=()=>{stop();start(null)};return}
+  cur=Q[qi];head();const w=cur,m=S.mode;
+  if(m==='cards'){
+    el.innerHTML=`<div class="fc tap" id="fc"><div class="tag">${esc(tName(w))}</div><div class="term">${esc(w.en)}</div>${sayBtn(w)}<div class="hint">Натисни, щоб побачити переклад</div></div><div class="rate" id="rt" style="visibility:hidden">${['Не знаю','Важко','Знаю'].map((t,g)=>`<button class="r${g}" data-g="${g}">${t}<small>${nextIv(w,g)}</small></button>`).join('')}</div>`;
+    const fc=$('fc');fc.onclick=e=>{if(e.target.dataset.say)return;flip()};if(canSpeak)say(w.en)}
+  else if(m==='write'){
+    el.innerHTML=`<div class="fc sm"><div class="tag">${esc(tName(w))} · напиши англійською</div><div class="tr">${esc(w.ua)}</div><div class="ex">${exHtml(w.ex,true)}</div></div><form id="wf"><div id="wr"></div><input type="text" id="wi" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Твоя відповідь"><div class="row" style="margin-top:10px;gap:8px" id="wb"><button class="btn pri" style="flex:1" type="submit">Перевірити</button><button class="btn" type="button" id="wk">Не знаю</button></div></form>`;
+    $('wi').focus();$('wf').onsubmit=e=>{e.preventDefault();check($('wi').value)};$('wk').onclick=()=>check(null)}
+  else{
+    const same=words().filter(x=>x.id!==w.id&&x.t===w.t&&x.ua!==w.ua),rest=words().filter(x=>x.id!==w.id&&x.ua!==w.ua);
+    const pick=(same.length>=3?same:rest).slice().sort(()=>Math.random()-.5).slice(0,3);
+    const opts=pick.concat(w).sort(()=>Math.random()-.5);
+    el.innerHTML=`<div class="fc sm"><div class="tag">${esc(tName(w))} · вибери переклад</div><div class="term">${esc(w.en)}</div>${sayBtn(w)}</div><div class="opts" id="op">${opts.map(o=>`<button data-id="${esc(o.id)}">${esc(o.ua)}</button>`).join('')}</div><div id="cn"></div>`;
+    $('op').onclick=e=>{const b=e.target.closest('button');if(!b||$('op').dataset.done)return;$('op').dataset.done=1;const ok=b.dataset.id===w.id;
+      $('op').querySelectorAll('button').forEach(x=>{if(x.dataset.id===w.id)x.classList.add('ok')});if(!ok)b.classList.add('no');
+      $('cn').innerHTML=`<div class="ex" style="margin:12px 0">${exHtml(w.ex)}</div><button class="btn pri" id="nx" style="width:100%">Далі</button>`;
+      $('nx').onclick=()=>answered(ok?2:0);$('nx').focus()};if(canSpeak)say(w.en)}
+}
+function flip(){const w=cur,fc=$('fc');if(!fc||fc.dataset.f)return;fc.dataset.f=1;fc.classList.remove('tap');
+  fc.innerHTML=`<div class="tag">${esc(w.en)}</div><div class="tr">${esc(w.ua)}</div><div class="ex">${exHtml(w.ex)}</div>${sayBtn(w)}`;$('rt').style.visibility='visible'}
+function norm(s){return s.toLowerCase().replace(/[’`]/g,"'").replace(/\(.*?\)/g,' ').replace(/\b(sth|sb|someone|something|somebody)\b/g,' ').replace(/\.\.\.|…/g,' ').replace(/[^a-z' -]/g,' ').replace(/\s+/g,' ').trim()}
+function alts(term){const parts=term.replace(/\(.*?\)/g,'').split('/').map(p=>p.trim()).filter(Boolean),a=parts[0].split(' '),out=[parts[0]];
+  for(const p of parts.slice(1)){const b=p.split(' ');if(b.length<a.length)out.push(a.slice(0,a.length-b.length).concat(b).join(' '));else{out.push(p);if(a.length===1&&b.length>1)out.push(a[0]+' '+b.slice(1).join(' '))}}
+  return out.concat(term).map(norm).filter(x=>x.length>1)}
+function lev(a,b){const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return d[b.length]}
+function check(v){const w=cur,A=alts(w.en),x=v==null?'':norm(v);
+  const exact=x&&A.includes(x),close=!exact&&x.length>4&&A.some(y=>lev(x,y)<=1);const ok=exact||close;
+  $('wr').innerHTML=`<div class="res ${ok?'ok':'no'}">${ok?(close?'Майже ідеально, є одна помилка. ':'Правильно! '):(v==null?'Правильна відповідь: ':'Не зовсім. Правильно: ')}<b>${esc(w.en)}</b></div>`;
+  $('wi').disabled=true;$('wb').innerHTML=`<button class="btn pri" style="flex:1" type="button" id="nx">Далі</button>${!ok&&v?'<button class="btn" type="button" id="me">Я написав правильно</button>':''}`;
+  $('nx').onclick=()=>answered(ok?2:0);$('nx').focus();if($('me'))$('me').onclick=()=>answered(2);if(canSpeak)say(w.en)}
+
+/* ---------- topic sheet ---------- */
+function sheet(tid){const t=topics().find(x=>x.id===tid),l=words().filter(w=>w.t===tid);
+  $('ov').classList.add('on');document.body.style.overflow='hidden';$('pBar').style.width='0';$('pCnt').textContent=l.length+' слів';
+  $('stage').innerHTML=`<h2 style="font-size:26px;margin:18px 0 12px">${esc(t.name)}</h2><button class="btn pri" id="go" style="width:100%;margin-bottom:14px">Вчити цю тему</button><div class="list">${l.map(w=>{const s=st(w.id);
+    return `<div class="wl"><span class="dot ${s?(s.b>=4?'d2':'d1'):''}"></span><span><b>${esc(w.en)}</b><br><span style="color:var(--mute)">${esc(w.ua)}</span></span>${w.t==='my'?`<button class="del" data-del="${esc(w.id)}">Видалити</button>`:''}</div>`}).join('')}</div><p class="note">Сіра крапка — нове слово, жовта — вчиш, зелена — вивчено.</p>`;
+  $('go').onclick=()=>{stop();start(tid)}}
+let undo=null;
+function toast(msg,fn){undo=fn;$('tMsg').textContent=msg;$('toast').classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('on'),5000)}
+
+/* ---------- events ---------- */
+$('startAll').onclick=()=>start(null);
+$('close').onclick=stop;
+$('topics').onclick=e=>{const b=e.target.closest('.tp');if(b)sheet(b.dataset.t)};
+document.querySelector('.seg').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.mode=b.dataset.m;save();render()};
+$('newPer').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.newPer=+b.textContent;save();render()};
+$('stage').addEventListener('click',e=>{const s=e.target.closest('[data-say]');if(s){e.stopPropagation();say(s.dataset.say)}
+  const g=e.target.closest('[data-g]');if(g)answered(+g.dataset.g);
+  const d=e.target.closest('[data-del]');if(d){const i=S.custom.findIndex(w=>w.id===d.dataset.del);if(i<0)return;const [w]=S.custom.splice(i,1),c=S.cards[w.id];delete S.cards[w.id];save();
+    toast('Слово видалено',()=>{S.custom.splice(i,0,w);if(c)S.cards[w.id]=c;save();render();if(S.custom.length)sheet('my')});
+    if(S.custom.length)sheet('my');else stop();render()}});
+$('tUndo').onclick=()=>{if(undo)undo();undo=null;$('toast').classList.remove('on')};
+$('addF').onsubmit=e=>{e.preventDefault();const en=$('aEn').value.trim(),ua=$('aUa').value.trim();if(!en||!ua)return;
+  let ex=$('aEx').value.trim();if(ex&&!ex.includes('**')){const i=ex.toLowerCase().indexOf(en.toLowerCase());if(i>=0)ex=ex.slice(0,i)+'**'+ex.slice(i,i+en.length)+'**'+ex.slice(i+en.length)}
+  S.custom.push({id:'c'+Date.now(),t:'my',en,ua,ex});save();render();e.target.reset();toast('Додано в «Мої слова»',null);$('tUndo').style.display='none';setTimeout(()=>$('tUndo').style.display='',5000)};
+document.addEventListener('keydown',e=>{if(!$('ov').classList.contains('on'))return;if(e.key==='Escape')return stop();
+  if(S.mode==='cards'&&$('fc')){if((e.key===' '||e.key==='Enter')&&!$('fc').dataset.f){e.preventDefault();flip()}else if($('fc').dataset.f&&['1','2','3'].includes(e.key))answered(+e.key-1)}});
+$('bCopy').onclick=async()=>{const code=enc(S);try{await navigator.clipboard.writeText(code);toast('Код скопійовано',null);$('tUndo').style.display='none';setTimeout(()=>$('tUndo').style.display='',5000)}
+  catch(e){$('bBox').style.display='block';$('bTxt').value=code;$('bTxt').select();$('bMsg').textContent='Скопіюй код вручну'}};
+$('bShow').onclick=()=>{$('bBox').style.display='block';$('bTxt').value='';$('bMsg').textContent='';$('bTxt').focus()};
+$('bLoad').onclick=()=>{try{const d=dec($('bTxt').value);if(!d||typeof d.cards!=='object')throw 0;
+  const old=JSON.parse(JSON.stringify(S));S=Object.assign({cards:{},custom:[],days:[],newPer:10,mode:'cards',u:0},d);save();render();$('bMsg').textContent='Прогрес відновлено';
+  toast('Прогрес відновлено',()=>{S=old;save();render()})}catch(e){$('bMsg').textContent='Код не підходить. Перевір, що скопійовано повністю.'}};
+render();
+}
+</script>
+</body>
+</html>
